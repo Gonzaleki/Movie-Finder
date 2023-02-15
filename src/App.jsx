@@ -1,50 +1,32 @@
 import './App.css'
-import { useEffect, useState } from 'react'
-
 // el useRef()
 // crear referencia del DOM
 // permite crear referencia mutale que persiste durante todo el ciclo de vida
 // util para guardar cualquier valor que puedas mutar, ID, elemento DOM, etc.
 // cuando cambia no renderiza el componente nuevamente
-
-import { useMovies } from './hooks/useMovies.js'
+// siempre con .current, ejemplo
+//
+// const counter = useRef(0)
+// counter.current++
+//
+// en ese caso de arriba no se reiniciara el valor a 0 cada vez que se renderiza el comp
+import { useMovies } from './hooks/useMovies'
+import { useSearch } from './hooks/useSearch'
 // nuestro custom hook
 import { Movies } from './mocks/components/Movies'
 
 function App () {
-  const [search, setSearch] = useState('')
-  const [error, setError] = useState(null)
-  const { movies } = useMovies()
+  const { search, setSearch, error } = useSearch()
+  const { movies, getMovies } = useMovies({ search })
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    console.log({ search })
+    getMovies()
   }
 
   const handleChange = (event) => {
-    const newSearch = event.target.value
-    if (newSearch.startsWith(' ')) return
     setSearch(event.target.value)
   }
-
-  // validar form de forma controlada
-  //
-  useEffect(() => {
-    if (search === '') {
-      setError('No se puede buscar la pelicula vacia')
-      return
-    }
-    if (search.match(/^\d+$/)) {
-      setError('No se puede buscar la pelicula vacia')
-      return
-    }
-    if (search.length < 3) {
-      setError('Debe tener al menos 3 caracteres')
-      return
-    }
-
-    setError(null)
-  }, [search])
 
   return (
     <div className='page'>
