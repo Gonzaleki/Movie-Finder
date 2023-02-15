@@ -10,14 +10,24 @@ import './App.css'
 // counter.current++
 //
 // en ese caso de arriba no se reiniciara el valor a 0 cada vez que se renderiza el comp
+import { useState, useEffect } from 'react'
 import { useMovies } from './hooks/useMovies'
 import { useSearch } from './hooks/useSearch'
 // nuestro custom hook
 import { Movies } from './mocks/components/Movies'
 
 function App () {
+  const [sort, setSort] = useState(false)
   const { search, setSearch, error } = useSearch()
-  const { movies, getMovies } = useMovies({ search })
+  const { movies, getMovies } = useMovies({ search, sort })
+
+  const handleSort = () => {
+    setSort(!sort)
+  }
+
+  useEffect(() => {
+    console.log('render')
+  }, [getMovies])
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -34,6 +44,7 @@ function App () {
         <h1>The Movie Finder</h1>
         <form className='form' action='' onSubmit={handleSubmit}>
           <input onChange={handleChange} value={search} name='search' type='text' placeholder='Interstellar, The Matrix ...' />
+          <input type='checkbox' onChange={handleSort} checked={sort} />
           <button type='submit'>Search</button>
         </form>
         {error && <p style={{ color: 'red' }}>{error}</p>}
