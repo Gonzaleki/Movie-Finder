@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from 'react'
+import { useState, useRef, useMemo, useCallback } from 'react'
 import { searchMovies } from '../service/movies'
 
 // este custom Hook se encarga de hacer el fetching de datos
@@ -6,15 +6,13 @@ export function useMovies ({ search, sort }) {
   const [movies, setMovies] = useState([])
   const previousSearch = useRef(search)
 
-  const getMovies = useMemo(() => {
-    return async () => {
-      if (search === previousSearch.current) return
+  const getMovies = useCallback(async ({ search }) => {
+    if (search === previousSearch.current) return
 
-      previousSearch.current = search
-      const newMovies = await searchMovies({ search })
-      setMovies(newMovies)
-    }
-  }, [search])
+    previousSearch.current = search
+    const newMovies = await searchMovies({ search })
+    setMovies(newMovies)
+  }, [])
 
   const sortedMovies = useMemo(() => {
     console.log('memo')

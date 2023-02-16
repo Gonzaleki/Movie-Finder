@@ -10,10 +10,12 @@ import './App.css'
 // counter.current++
 //
 // en ese caso de arriba no se reiniciara el valor a 0 cada vez que se renderiza el comp
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
+// nuestros custom hooks
 import { useMovies } from './hooks/useMovies'
 import { useSearch } from './hooks/useSearch'
-// nuestro custom hook
+import debounce from 'just-debounce-it'
+
 import { Movies } from './mocks/components/Movies'
 
 function App () {
@@ -25,17 +27,23 @@ function App () {
     setSort(!sort)
   }
 
-  useEffect(() => {
-    console.log('render')
-  }, [getMovies])
+  // para que el debounce no se ejecute cada vez que se renderea el componente usaremos useCallback
+  const debounceGetMovies = useCallback(debounce(search => {
+    console.log('search', search)
+    getMovies({ search })
+  }, 500)
+  , [getMovies])
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    getMovies()
+    getMovies({ search })
   }
 
   const handleChange = (event) => {
-    setSearch(event.target.value)
+    const newSearch = event.target.value
+    setSearch(newSearch)
+    debounceGetMovies(newSearch)
+    // hacer la busqueda mientras escribimos
   }
 
   return (
